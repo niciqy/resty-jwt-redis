@@ -1,0 +1,30 @@
+version: "3"
+services:
+  openresty:
+    image: "svyatogor/resty-lua-jwt"
+    container_name: openresty-dev
+    ports:
+      - 80:80
+    links:
+      - redis
+      - nodejs-sample-app
+    volumes:
+      - ./src/nginx/nginx.conf:/usr/nginx/conf/nginx.conf
+      - ./src/lua-resty-jwt/jwt.lua:/lua-resty-jwt/jwt.lua
+  redis:
+    image: "redis:alpine"
+    ports:
+      - 6379:6379
+    volumes:
+      - ./src/redis/dump.rdb:/data
+  nodejs-sample-app:
+    container_name: nodejs-sample-app
+    volumes:
+      - ./nodejs-sample-app/src:/app/src
+      - nodejs-sample-app_node_modules:/app/node_modules
+    build:
+      context: ./nodejs-sample-app/
+      dockerfile: dev.Dockerfile
+
+volumes:
+  nodejs-sample-app_node_modules:
